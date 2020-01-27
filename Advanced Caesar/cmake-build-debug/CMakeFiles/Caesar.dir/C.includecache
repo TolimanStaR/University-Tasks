@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/Clion/Caesar/file.c
+stdio.h
+-
+stdlib.h
+-
+file.h
+E:/Clion/Caesar/file.h
+
+E:/Clion/Caesar/file.h
+
