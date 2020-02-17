@@ -1,18 +1,9 @@
-#ifndef LOVUSHKAJOKERA_CASINO_H
-#define LOVUSHKAJOKERA_CASINO_H
+#include <stdlib.h>
 
-int *input();
+struct Deck create(int cards, struct Deck deck);
 
-int max(int a, int b);
+struct Deck shuffle(int cards, struct Deck deck, int iden);
 
-struct Deck createDeck(int numberOfCards);
+void game(int players, int cards, struct Deck deck, int iden);
 
-void handOutDeck(struct Deck deck, int numberOfPlayers);
-
-struct Deck shuffle(struct Deck deck, int numberOfCards, int gameId);
-
-void game(int numberOfPlayers, int numberOfCards, struct Deck deck);
-
-// int lovushkaJokera();
-
-#endif
+void LovushkaJokera();

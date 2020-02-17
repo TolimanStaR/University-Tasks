@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/Clion/University-Tasks/LovushkaJokera/casino.c
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+structures.h
+E:/Clion/University-Tasks/LovushkaJokera/structures.h
+
+E:/Clion/University-Tasks/LovushkaJokera/structures.h
+

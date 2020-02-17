@@ -1,15 +1,9 @@
 struct Card {
-    char front[20];
-    char id[20];
+    char class[8];
+    char id[6];
 };
 
-
 struct Deck {
-    int numberOfCards;
     struct Card *stack;
 };
 
-struct Player {
-    unsigned int playerId;
-    struct Card *cardSet;
-};
