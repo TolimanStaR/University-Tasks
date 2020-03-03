@@ -6,13 +6,17 @@
 
 #IncludeRegexTransform: 
 
-E:/Clion/University-Tasks/LovushkaJokera/casino.c
+E:/Clion/University-Tasks/LovushkaJokera/casino.h
 stdlib.h
 -
+
+E:/Clion/University-Tasks/LovushkaJokera/main.c
 stdio.h
 -
-string.h
+stdlib.h
 -
+casino.h
+E:/Clion/University-Tasks/LovushkaJokera/casino.h
 structures.h
 E:/Clion/University-Tasks/LovushkaJokera/structures.h
 

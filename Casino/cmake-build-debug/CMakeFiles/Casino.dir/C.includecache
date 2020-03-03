@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/Clion/Casino/casino.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+wchar.h
+-
+locale.h
+-
+fcntl.h
+-
+io.h
+-
+structures.h
+E:/Clion/Casino/structures.h
+data.h
+E:/Clion/Casino/data.h
+
+E:/Clion/Casino/data.h
+
+E:/Clion/Casino/structures.h
+

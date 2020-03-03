@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
      scanf("%d%d", &players, &cards);
      struct Deck deck;
      deck = create(cards, deck);
+
      int iden = 1;
 
      if (cards == 54) {
