@@ -20,7 +20,11 @@ Dict *deleteDict(char name[], char *dictList[]);
 
 Dict *shell(Dict *dictSet, int index);
 
+Dict *append(Dict *dictSet, int index, const char command[]);
+
 void showDirectory(char *dictList[], int countOfDicts);
+
+void showDict(Dict *dictSet, int index);
 
 void FinishSession();
 

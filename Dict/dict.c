@@ -52,15 +52,58 @@ Dict *createDict(Dict *dictSet, char name[], char *dictList[], int countOfDicts)
      dictSet[countOfDicts - 1].actualSize = 10;
      dictSet[countOfDicts - 1].maxSize = 100000;
      dictSet[countOfDicts - 1].dictionary = (Element *) calloc(dictSet->actualSize, sizeof(Element));
+     dictSet[countOfDicts - 1].realSize = 0;
 
      return dictSet;
 }
 
 void showDirectory(char *dictList[], int countOfDicts) {
-     puts("\n(console) >>> Existing dictionaries:");
+     puts("(console) >>> Existing dictionaries:");
      for (int i = 0; i < countOfDicts; ++i) {
           printf("(console) >>> %d: %s\n", i + 1, dictList[i]);
      }
+}
+
+void showDict(Dict *dictSet, int index) {
+
+     if (dictSet[index].realSize > 0) {
+
+          for (long long i = 0; i < dictSet[index].realSize; ++i) {
+               printf("%s : ", dictSet[index].dictionary[i].key);
+               switch (dictSet[index].dictionary[i].type) {
+                    case 'i':
+                         printf("%lld\n", dictSet[index].dictionary[i].value.integer);
+                         break;
+                    case 'd':
+                         printf("%Lf\n", dictSet[index].dictionary[i].value.real_number);
+                         break;
+                    case 's':
+                         printf("%s\n", dictSet[index].dictionary[i].value.string);
+                         break;
+                    default:
+                         printf("<undefined>\n");
+               }
+          }
+     } else
+          printf("(console: %s) >>> Dict is empty.\n", dictSet[index].name);
+}
+
+Dict *append(Dict *dictSet, int index, const char command[]) {
+     int cnt = 0;
+     int start;
+     int keyLength = 0;
+     char valueType;
+     while (command[cnt++] != ' ');
+     ++cnt;
+     start = cnt;
+     char *key;
+     while (command[cnt + keyLength++] != ' ');
+     key = (char *) calloc(keyLength + 1, sizeof(char));
+     for (int i = cnt; i < cnt + keyLength; ++i) key[i] = command[i];
+     printf("%s", key);
+
+
+     return dictSet;
 }
 
 void FinishSession() {
@@ -69,13 +112,35 @@ void FinishSession() {
 }
 
 Dict *shell(Dict *dictSet, int index) {
-     printf("(console: %s) >>> ", dictSet[index].name);
 
      char *command = (char *) calloc(100, sizeof(char));
-     int cnt = 0;
-     while (command[cnt++] != ' ')
 
-          return dictSet;
+     continueShell:
+     {
+          printf("(console: %s) >>>", dictSet[index].name);
+
+          free(command);
+          char *command = (char *) calloc(100, sizeof(char));
+          gets(command);
+
+          int cnt = 0;
+          while (command[cnt] != ' ' and command[cnt++] != '\0');
+          char *operator = (char *) calloc(cnt + 1, sizeof(char));
+          for (int i = 0; i < cnt; ++i) operator[i] = command[i];
+
+          if (equal(operator, "printf")) {
+               showDict(dictSet, index);
+               goto continueShell;
+          }
+
+          if (equal(operator, "append")) {
+               dictSet = append(dictSet, index, command);
+               goto continueShell;
+          }
+
+     };
+
+     return dictSet;
 }
 
 void session() {
@@ -94,7 +159,7 @@ void session() {
 
      continueSession:
      {
-          puts("(console) >>> ");
+          printf("(console) >>>");
           // Получение команды от пользователя, находящегося в сессии.
           free(command);
           char *command = (char *) calloc(100, sizeof(char));
@@ -102,8 +167,8 @@ void session() {
 
           // Получение оператора действия.
 
-          int cnt = -1;
-          while (command[++cnt] != ' ');
+          int cnt = 0;
+          while (command[cnt] != ' ') ++cnt;
           char *operator = (char *) calloc(cnt + 1, sizeof(char));
           for (int i = 0; i < cnt; ++i) operator[i] = command[i];
 
@@ -123,7 +188,7 @@ void session() {
                goto continueSession;
           }
 
-          if (equal(operator, "directory")) {
+          if (equal(operator, "directory") or equal(operator, "dir")) {
                showDirectory(dictList, numberOfDictionaries);
                goto continueSession;
           }
@@ -145,9 +210,9 @@ void session() {
 
                if (findDictionary(dictList, nameOfDict, numberOfDictionaries)) {
                     int index = getIndex(dictList, nameOfDict, numberOfDictionaries);
-                    shell(dictSet, index);
+                    dictSet = shell(dictSet, index);
                } else {
-                    puts("(console) >>> Dictionary not found.");
+                    printf("(console) >>> Dictionary not found.\n");
                }
 
                goto continueSession;

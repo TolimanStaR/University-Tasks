@@ -6,7 +6,5 @@ int main() {
 
      session();
 
-
-
      return 0;
 }

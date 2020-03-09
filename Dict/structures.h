@@ -10,11 +10,13 @@ typedef union value {
 
 typedef struct Element {
     char key[30];
+    char type;
     Value value;
 } Element;
 
 typedef struct Dict {
     Element *dictionary;
+    long long realSize;
     long long actualSize;
     long long maxSize;
     char name[100];
