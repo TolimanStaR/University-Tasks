@@ -135,6 +135,8 @@ Dict *append(Dict *dictSet, int index, const char key[], char typeOfValue, const
           {
                dictSet[index].realSize += 1;
 
+               char pointer[] = "@deleted\0";
+
                for (int i = 0; i < len(key); ++i)
                     dictSet[index].dictionary[dictSet[index].realSize - 1].key[i] = key[i];
 
@@ -160,6 +162,8 @@ Dict *append(Dict *dictSet, int index, const char key[], char typeOfValue, const
                          break;
                     default:
                          printf("(console: %s) >>> Invalid value\n", dictSet[index].name);
+                         for (int i = 0; i < len(pointer) + 1; ++i)
+                              dictSet[index].dictionary[dictSet[index].realSize - 1].key[i] = pointer[i];
                          break;
                }
           };
@@ -218,7 +222,7 @@ Dict *shell(Dict *dictSet, int index) {
           char *operator = (char *) calloc(cnt + 1, sizeof(char));
           for (int i = 0; i < cnt; ++i) operator[i] = command[i];
 
-          if (equal(operator, "printf")) {
+          if (equal(operator, "print")) {
                showDict(dictSet, index);
                goto continueShell;
           }
@@ -243,7 +247,6 @@ Dict *shell(Dict *dictSet, int index) {
                for (; command[cnt + keyLength++] != '\0';);
                key = (char *) calloc(keyLength + 1, sizeof(char));
                for (int i = cnt; i < len(command); ++i) key[i - cnt] = command[i];
-               printf("%s", key);
                removeElement(dictSet, index, key);
 
                goto continueShell;
