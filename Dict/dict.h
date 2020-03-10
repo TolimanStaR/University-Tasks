@@ -16,15 +16,13 @@ int getIndex(char *dictList[], char name[], int countOfDicts);
 
 Dict *createDict(Dict dictSet, char name[], char *dictList[], int countOfDicts);
 
-Dict *deleteDict(char name[], char *dictList[]);
-
 Dict *shell(Dict *dictSet, int index);
 
 Dict *append(Dict *dictSet, int index, const char key[], char typeOfValue, const char command[]);
 
 Dict *removeElement(Dict *dictSet, int index, const char key[]);
 
-void showDirectory(char *dictList[], int countOfDicts);
+void showDirectory(Dict *dictSet, int countOfDicts);
 
 void showDict(Dict *dictSet, int index);
 

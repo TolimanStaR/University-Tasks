@@ -8,12 +8,18 @@
 
 
 int len(const char string[]) {
+
+     // Подсчет длины строки.
+
      int j = -1;
      while (string[++j]);
      return j;
 }
 
 int equal(const char string1[], const char string2[]) {
+
+     // Сравнение строк.
+
      int i = 0;
      while (string2[i] == string1[i]) {
           ++i;
@@ -22,6 +28,9 @@ int equal(const char string1[], const char string2[]) {
 }
 
 int findDictionary(char *dictList[], char name[], int countOfDicts) {
+
+     // Проверка на наличие словаря по названию.
+
      int flag = 0;
      for (int i = 0; i < countOfDicts; ++i) {
           if (equal(name, dictList[i])) {
@@ -32,6 +41,9 @@ int findDictionary(char *dictList[], char name[], int countOfDicts) {
 }
 
 int getIndex(char *dictList[], char name[], int countOfDicts) {
+
+     // Поиск "местоположения" словаря.
+
      int index = 0;
      for (int i = 0; i < countOfDicts; ++i) {
           if (equal(name, dictList[i])) {
@@ -43,6 +55,8 @@ int getIndex(char *dictList[], char name[], int countOfDicts) {
 }
 
 Dict *createDict(Dict *dictSet, char name[], char *dictList[], int countOfDicts) {
+
+     // Создание словаря.
 
      for (int i = 0; i < len(name); ++i) {
           dictList[countOfDicts - 1][i] = name[i];
@@ -57,14 +71,19 @@ Dict *createDict(Dict *dictSet, char name[], char *dictList[], int countOfDicts)
      return dictSet;
 }
 
-void showDirectory(char *dictList[], int countOfDicts) {
+void showDirectory(Dict *dictSet, int countOfDicts) {
+
+     // Распечатка существующих словарей.
+
      puts("(console) >>> Existing dictionaries:");
      for (int i = 0; i < countOfDicts; ++i) {
-          printf("(console) >>> %d: %s\n", i + 1, dictList[i]);
+          printf("(console) >>> %d : %s\n", i + 1, dictSet[i].name);
      }
 }
 
 void showDict(Dict *dictSet, int index) {
+
+     // Вывод определенного словаря полностью.
 
      if (dictSet[index].realSize > 0) {
 
@@ -96,12 +115,20 @@ void showDict(Dict *dictSet, int index) {
 
 Dict *append(Dict *dictSet, int index, const char key[], char typeOfValue, const char command[]) {
 
+     // Добавление элемента в словарь.
+
+     // Проверка на наличие ключа:
+
      for (long long i = 0; i < dictSet[index].realSize; ++i) {
           if (equal(key, dictSet[index].dictionary[i].key)) {
                printf("(console: %s) >>> Key already exist! Please choose other key.\n", dictSet[index].name);
                return dictSet;
           }
      }
+
+     // *****
+
+     // Добавление элемента. Если необходимо, выделяется память.
 
      if (dictSet[index].realSize + 1 < dictSet[index].actualSize) {
           memoryHasAllocated:
@@ -145,11 +172,14 @@ Dict *append(Dict *dictSet, int index, const char key[], char typeOfValue, const
                printf("(console: %s) >>> Not enough memory!\n", dictSet[index].name);
      }
 
+     // *****
 
      return dictSet;
 }
 
 Dict *removeElement(Dict *dictSet, int index, const char key[]) {
+
+     // "Удаление" элемента. Формально его больше никак не получить.
 
      char pointer[] = "@deleted\0";
 
@@ -170,6 +200,8 @@ void FinishSession() {
 }
 
 Dict *shell(Dict *dictSet, int index) {
+
+     // Интерактивное взаимодейсвие со словарем.
 
      char *command = (char *) calloc(100, sizeof(char));
 
@@ -208,14 +240,18 @@ Dict *shell(Dict *dictSet, int index) {
                char *key;
                int keyLength = 0;
                ++cnt;
-               for (; command[keyLength++] != '\0';);
+               for (; command[cnt + keyLength++] != '\0';);
                key = (char *) calloc(keyLength + 1, sizeof(char));
-               for (int i = cnt; cnt < len(command); ++i) key[i - cnt] = command[i];
-
-
+               for (int i = cnt; i < len(command); ++i) key[i - cnt] = command[i];
+               printf("%s", key);
                removeElement(dictSet, index, key);
 
                goto continueShell;
+          }
+
+          if (equal(operator, "exit()") or equal(operator, "quit()")) {
+               printf("(console: %s) >>> Back to main session...\n", dictSet[index].name);
+               return dictSet;
           }
      };
 
@@ -223,6 +259,9 @@ Dict *shell(Dict *dictSet, int index) {
 }
 
 void session() {
+
+     // Интерактивное взаимодействие со всей "библиотекой".
+
      puts(">>> Session has started.\n");
 
      int numberOfDictionaries = 0;
@@ -268,7 +307,7 @@ void session() {
           }
 
           if (equal(operator, "directory") or equal(operator, "dir")) {
-               showDirectory(dictList, numberOfDictionaries);
+               showDirectory(dictSet, numberOfDictionaries);
                goto continueSession;
           }
 
@@ -297,11 +336,6 @@ void session() {
                goto continueSession;
           }
 
-
-          // test
-          printf("%d\n", equal(operator, "print"));
-
-          printf("%s", operator);
           exit(0);
      }
 }
