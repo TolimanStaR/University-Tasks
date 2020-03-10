@@ -69,42 +69,100 @@ void showDict(Dict *dictSet, int index) {
      if (dictSet[index].realSize > 0) {
 
           for (long long i = 0; i < dictSet[index].realSize; ++i) {
-               printf("%s : ", dictSet[index].dictionary[i].key);
-               switch (dictSet[index].dictionary[i].type) {
-                    case 'i':
-                         printf("%lld\n", dictSet[index].dictionary[i].value.integer);
-                         break;
-                    case 'd':
-                         printf("%Lf\n", dictSet[index].dictionary[i].value.real_number);
-                         break;
-                    case 's':
-                         printf("%s\n", dictSet[index].dictionary[i].value.string);
-                         break;
-                    default:
-                         printf("<undefined>\n");
+               if (!equal(dictSet[index].dictionary[i].key, "@deleted")) {
+                    printf("%s : ", dictSet[index].dictionary[i].key);
+                    switch (dictSet[index].dictionary[i].type) {
+                         case 'i':
+                              printf("%lld\n", dictSet[index].dictionary[i].value.integer);
+                              break;
+                         case 'd':
+                              printf("%f\n", dictSet[index].dictionary[i].value.real_number);
+                              break;
+                         case 's':
+                              printf("%s\n", dictSet[index].dictionary[i].value.string);
+                              break;
+                         default:
+                              printf("<undefined>\n");
+                              break;
+                    }
                }
           }
      } else
           printf("(console: %s) >>> Dict is empty.\n", dictSet[index].name);
 }
 
-Dict *append(Dict *dictSet, int index, const char command[]) {
-     int cnt = 0;
-     int start;
-     int keyLength = 0;
-     char valueType;
-     while (command[cnt++] != ' ');
-     ++cnt;
-     start = cnt;
-     char *key;
-     while (command[cnt + keyLength++] != ' ');
-     key = (char *) calloc(keyLength + 1, sizeof(char));
-     for (int i = cnt; i < cnt + keyLength; ++i) key[i] = command[i];
-     printf("%s", key);
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err34-c"
+
+Dict *append(Dict *dictSet, int index, const char key[], char typeOfValue, const char command[]) {
+
+     for (long long i = 0; i < dictSet[index].realSize; ++i) {
+          if (equal(key, dictSet[index].dictionary[i].key)) {
+               printf("(console: %s) >>> Key already exist! Please choose other key.\n", dictSet[index].name);
+               return dictSet;
+          }
+     }
+
+     if (dictSet[index].realSize + 1 < dictSet[index].actualSize) {
+          memoryHasAllocated:
+          {
+               dictSet[index].realSize += 1;
+
+               for (int i = 0; i < len(key); ++i)
+                    dictSet[index].dictionary[dictSet[index].realSize - 1].key[i] = key[i];
+
+               dictSet[index].dictionary[dictSet[index].realSize - 1].type = typeOfValue;
+
+               int lengthOfValue = 0;
+               int iterator = 0;
+               char *value;
+               for (int i = len(command) - 1; command[i] != ' '; --i) lengthOfValue++;
+               value = (char *) calloc(lengthOfValue + 1, sizeof(char));
+               for (int i = len(command) - 1 - lengthOfValue; i < len(command); ++i)
+                    value[iterator++] = command[i];
+               switch (typeOfValue) {
+                    case 'i':
+                         dictSet[index].dictionary[dictSet[index].realSize - 1].value.integer = atoi(value);
+                         break;
+                    case 'd':
+                         dictSet[index].dictionary[dictSet[index].realSize - 1].value.real_number = strtod(value, NULL);
+                         break;
+                    case 's':
+                         for (int i = 0; i < len(value); ++i)
+                              dictSet[index].dictionary[dictSet[index].realSize - 1].value.string[i] = value[i];
+                         break;
+                    default:
+                         printf("(console: %s) >>> Invalid value\n", dictSet[index].name);
+                         break;
+               }
+          };
+     } else {
+          if (dictSet[index].actualSize * 2 < dictSet[index].maxSize) {
+               dictSet = realloc(dictSet, dictSet[index].realSize * 2);
+               dictSet[index].actualSize = dictSet[index].realSize * 2;
+               goto memoryHasAllocated;
+          } else
+               printf("(console: %s) >>> Not enough memory!\n", dictSet[index].name);
+     }
 
 
      return dictSet;
 }
+
+Dict *removeElement(Dict *dictSet, int index, const char key[]) {
+
+     char pointer[] = "@deleted\0";
+
+     for (long long i = 0; i < dictSet[index].realSize; ++i) {
+          if (equal(dictSet[index].dictionary[i].key, key)) {
+               for (int j = 0; j < len(pointer); ++j) dictSet[index].dictionary[i].key[j] = pointer[j];
+          }
+     }
+
+     return dictSet;
+}
+
+#pragma clang diagnostic pop
 
 void FinishSession() {
      puts("(console) >>> saving objects and exiting session...\n");
@@ -134,10 +192,31 @@ Dict *shell(Dict *dictSet, int index) {
           }
 
           if (equal(operator, "append")) {
-               dictSet = append(dictSet, index, command);
+               ++cnt;
+               int keyLength = 0;
+               char type;
+               while (command[cnt + keyLength] != ' ') ++keyLength;
+               char *key = (char *) calloc(keyLength + 1, sizeof(char));
+               for (int i = cnt; i < cnt + keyLength; ++i) key[i - cnt] = command[i];
+               type = command[cnt + keyLength + 1];
+               dictSet = append(dictSet, index, key, type, command);
+
                goto continueShell;
           }
 
+          if (equal(operator, "remove")) {
+               char *key;
+               int keyLength = 0;
+               ++cnt;
+               for (; command[keyLength++] != '\0';);
+               key = (char *) calloc(keyLength + 1, sizeof(char));
+               for (int i = cnt; cnt < len(command); ++i) key[i - cnt] = command[i];
+
+
+               removeElement(dictSet, index, key);
+
+               goto continueShell;
+          }
      };
 
      return dictSet;
@@ -152,7 +231,7 @@ void session() {
 
      Dict *dictSet;
      char **dictList;
-     dictSet = (Dict *) calloc(10, sizeof(Dict));
+     dictSet = (Dict *) calloc(25, sizeof(Dict));
      dictList = (char **) calloc(10, sizeof(char *));
      for (int i = 0; i < 10; ++i) dictList[i] = (char *) calloc(100, sizeof(char));
      char *command = (char *) calloc(100, sizeof(char));

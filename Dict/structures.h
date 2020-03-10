@@ -4,7 +4,7 @@
 
 typedef union value {
     long long integer;
-    long double real_number;
+    double real_number;
     char string[100];
 } Value;
 
