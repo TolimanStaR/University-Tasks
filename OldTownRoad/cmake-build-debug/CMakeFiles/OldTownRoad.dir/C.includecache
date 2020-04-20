@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/Clion/OldTownRoad/header.h
+
+E:/Clion/OldTownRoad/main.c
+stdio.h
+-
+stdlib.h
+-
+header.h
+E:/Clion/OldTownRoad/header.h
+
+E:/Clion/OldTownRoad/source.c
+stdlib.h
+-
+stdio.h
+-
+header.h
+E:/Clion/OldTownRoad/header.h
+
