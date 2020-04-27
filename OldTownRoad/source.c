@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "header.h"
 
@@ -14,21 +14,29 @@
 
 
 Edge *new(int size) {
-     Edge* array;
+     Edge *array;
      array = (Edge *) calloc(size, sizeof(Edge));
      return array;
 }
 
 
 int *newBoolean(int size) {
-	int* array;
-	array = (int*)calloc(size, sizeof(int));
-	return array;
+     int *array;
+     array = (int *) calloc(size, sizeof(int));
+     return array;
+}
+
+
+int *newInt(int size) {
+     int *array;
+     array = (int*) calloc(size, sizeof(int));
+     return array;
 }
 
 
 void print(Edge *array, int size) {
-     repeat(size) printf("Edge between vertexes %d and %d (Cost is %d)\n", array[i].firstVertex + 1, array[i].secondVertex + 1, array[i].cost);
+     repeat(size) printf("Edge between vertexes %d and %d (Cost is %d)\n",
+             array[i].firstVertex + 1, array[i].secondVertex + 1, array[i].cost);
      puts("\n");
 }
 
@@ -41,34 +49,27 @@ int compare(Edge firstStruct, Edge SecondStruct) {
 Edge *merge(Edge *leftArray, Edge *rightArray, int leftSize, int rightSize) {
      Edge *arrayToReturn = new(leftSize + rightSize);
 
-     int leftFlag = 0;
-     int rightFlag = 0;
-     int retIndex = 0;
+     int leftFlag, rightFlag, retIndex;
+     leftFlag = rightFlag = retIndex = 0;
+
 
      while (leftFlag < leftSize and rightFlag < rightSize) {
           if (compare(leftArray[leftFlag], rightArray[rightFlag])) {
-               arrayToReturn[retIndex] = rightArray[rightFlag];
-               ++rightFlag;
+               arrayToReturn[retIndex++] = rightArray[rightFlag++];
           } else {
-               arrayToReturn[retIndex] = leftArray[leftFlag];
-               ++leftFlag;
+               arrayToReturn[retIndex++] = leftArray[leftFlag++];
           }
-          ++retIndex;
      }
 
+     int repeatTimes = __max(rightSize - rightFlag, leftSize - leftFlag);
+
      if (leftSize is leftFlag) {
-          int rep = rightSize - rightFlag;
-          repeat(rep) {
-               arrayToReturn[retIndex] = rightArray[rightFlag];
-               ++retIndex;
-               ++rightFlag;
+          repeat(repeatTimes) {
+               arrayToReturn[retIndex++] = rightArray[rightFlag++];
           }
      } else {
-          int rep = leftSize - leftFlag;
-          repeat(rep) {
-               arrayToReturn[retIndex] = leftArray[leftFlag];
-               ++retIndex;
-               ++leftFlag;
+          repeat(repeatTimes) {
+               arrayToReturn[retIndex++] = leftArray[leftFlag++];
           }
      }
 
@@ -100,28 +101,34 @@ Edge *mergeSort(Edge *array, int size) {
 }
 
 
-Edge* kruskalAlgorithm(Edge*graph, int numberOfVertexes, int numberOfEdges) {
-	int* used = newBoolean(numberOfVertexes);
+Edge *kruskalAlgorithm(Edge *graph, int numberOfVertexes, int numberOfEdges) {
 
-	graph = mergeSort(graph, numberOfEdges);
+     int *used = newBoolean(numberOfVertexes);
+     int *parent = newInt(numberOfVertexes);
+     Edge *newGraph = new(numberOfVertexes - 1);
 
-	Edge *newGraph = new(numberOfVertexes - 1);
-	int newIndex = 0;
+     graph = mergeSort(graph, numberOfEdges);
 
-	int numberOfTrees = numberOfVertexes;
+     repeat(numberOfEdges) {
+          graph[i].firstVertex -= 1;
+          graph[i].secondVertex -= 1;
+     }
 
+     int graphIndex, newIndex;
+     graphIndex = newIndex = 0;
 
-	for (int i = 0; i < numberOfEdges; ++i) {
-		graph[i].firstVertex -= 1;
-		graph[i].secondVertex -= 1;
+     int numberOfTrees = numberOfVertexes;
 
-		if ((not used[graph[i].firstVertex] or not used[graph[i].secondVertex]) or numberOfTrees > 1) {
-		     used[graph[i].firstVertex] = True;
-		     used[graph[i].secondVertex] = True;
-		     newGraph[newIndex++] = graph[i];
-		     --numberOfTrees;
-		}
-		if (numberOfTrees == 1) return newGraph;
-	}
+     repeat(numberOfVertexes) makeSet(i, parent);
+
+     while (numberOfTrees > 1) {
+          if (findSet(graph[graphIndex].firstVertex, parent) != findSet(graph[graphIndex].secondVertex, parent)) {
+               uniteSets(graph[graphIndex].firstVertex, graph[graphIndex].secondVertex, parent);
+               newGraph[newIndex++] = graph[graphIndex];
+               --numberOfTrees;
+          }
+          ++graphIndex;
+     }
+
+     return newGraph;
 }
-
