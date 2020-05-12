@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/Clion/CoolerTreeMaster/header.h
+
+E:/Clion/CoolerTreeMaster/main.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+header.h
+E:/Clion/CoolerTreeMaster/header.h
+
