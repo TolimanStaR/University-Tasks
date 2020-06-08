@@ -74,7 +74,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="E:/Clion/University-Tasks/ChatServer/data.h">
+			<Option target="ChatServer"/>
+		</Unit>
+		<Unit filename="E:/Clion/University-Tasks/ChatServer/header.h">
+			<Option target="ChatServer"/>
+		</Unit>
 		<Unit filename="E:/Clion/University-Tasks/ChatServer/main.c">
+			<Option target="ChatServer"/>
+		</Unit>
+		<Unit filename="E:/Clion/University-Tasks/ChatServer/source.c">
 			<Option target="ChatServer"/>
 		</Unit>
 		<Unit filename="E:/Clion/University-Tasks/ChatServer/CMakeLists.txt">

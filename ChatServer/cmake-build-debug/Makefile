@@ -149,6 +149,33 @@ main.c.s:
 	$(MAKE) -f CMakeFiles\ChatServer.dir\build.make CMakeFiles/ChatServer.dir/main.c.s
 .PHONY : main.c.s
 
+source.obj: source.c.obj
+
+.PHONY : source.obj
+
+# target to build an object file
+source.c.obj:
+	$(MAKE) -f CMakeFiles\ChatServer.dir\build.make CMakeFiles/ChatServer.dir/source.c.obj
+.PHONY : source.c.obj
+
+source.i: source.c.i
+
+.PHONY : source.i
+
+# target to preprocess a source file
+source.c.i:
+	$(MAKE) -f CMakeFiles\ChatServer.dir\build.make CMakeFiles/ChatServer.dir/source.c.i
+.PHONY : source.c.i
+
+source.s: source.c.s
+
+.PHONY : source.s
+
+# target to generate assembly for a file
+source.c.s:
+	$(MAKE) -f CMakeFiles\ChatServer.dir\build.make CMakeFiles/ChatServer.dir/source.c.s
+.PHONY : source.c.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -161,6 +188,9 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
+	@echo ... source.obj
+	@echo ... source.i
+	@echo ... source.s
 .PHONY : help
 
 

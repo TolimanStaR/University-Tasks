@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "E:/Clion/University-Tasks/ChatClient/main.c" "E:/Clion/University-Tasks/ChatClient/cmake-build-debug/CMakeFiles/ChatClient.dir/main.c.obj"
+  "E:/Clion/University-Tasks/ChatClient/source.c" "E:/Clion/University-Tasks/ChatClient/cmake-build-debug/CMakeFiles/ChatClient.dir/source.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

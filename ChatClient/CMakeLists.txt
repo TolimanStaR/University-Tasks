@@ -3,4 +3,4 @@ project(ChatClient C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(ChatClient main.c)
+add_executable(ChatClient main.c header.h source.c)

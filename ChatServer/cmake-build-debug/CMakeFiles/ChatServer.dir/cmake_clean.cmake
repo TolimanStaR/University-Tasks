@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/ChatServer.dir/main.c.obj"
+  "CMakeFiles/ChatServer.dir/source.c.obj"
   "ChatServer.exe"
   "ChatServer.exe.manifest"
   "ChatServer.pdb"
