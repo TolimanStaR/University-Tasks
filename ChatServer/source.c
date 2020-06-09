@@ -83,38 +83,65 @@ int userAuthorisation(int socket) {
         strcpy(serverMessage, "Successful registration!");
         write(socket, serverMessage, strlen(serverMessage));
 
-        return 0;
+        return newUser.userID;
     }
 
     if (!strcmp(userCommand[1], clientMessage)) {
         char username[31] = {0};
         char password[31] = {0};
-        int read_size;
+
+        EnterUserNameLogin:
 
         strcpy(serverMessage, "Enter your username >>> ");
         write(socket, serverMessage, strlen(serverMessage));
         read_size = recv(socket, username, 31, 0);
         username[read_size - 1] = '\0';
-    }
 
-    return 0;
+        for (unsigned int userIndex = 0; userIndex < usersCount; ++userIndex) {
+            if (!strcmp(username, usersList[userIndex].username)) {
+
+                EnterPasswordLogin:
+
+                strcpy(serverMessage, "Enter your password >>> ");
+                write(socket, serverMessage, strlen(serverMessage));
+                read_size = recv(socket, password, 31, 0);
+                password[read_size - 1] = '\0';
+                if (strcmp(password, usersList[userIndex].password) != 0) {
+                    strcpy(serverMessage, "Passwords didn't match. ");
+                    write(socket, serverMessage, strlen(serverMessage));
+                    goto EnterPasswordLogin;
+                } else {
+                    strcpy(serverMessage, "You logged in!");
+                    write(socket, serverMessage, strlen(serverMessage));
+                    usersList[userIndex].status = Online;
+
+                    return usersList[userIndex].userID;
+                }
+            }
+        }
+
+        strcpy(serverMessage, "This username doesn't exist.");
+        write(socket, serverMessage, strlen(serverMessage));
+        goto EnterUserNameLogin;
+
+    }
 }
 
 
 void *connection_handler(void *socket_desc) {
     int sock = *(int *) socket_desc;
-    int read_size, authorisationCode;
+    int read_size, userID;
     char client_message[MESSAGE_LENGTH];
 
-    authorisationCode = userAuthorisation(sock);
+    userID = userAuthorisation(sock);
 
-    if (authorisationCode != 0)
+    if (userID == -1) {
+        write(sock, "Something went wrong. Disconnect...", 50);
         return (void *) -1;
+    }
 
 
     while ((read_size = recv(sock, client_message, MESSAGE_LENGTH, 0)) > 0) {
-
-        // write(sock, client_message, read_size);
         printf("client message is (%d sym) >>> %s", read_size, client_message);
 
 
@@ -124,13 +151,13 @@ void *connection_handler(void *socket_desc) {
 
     if (read_size == 0) {
         puts("Client disconnected");
+        usersList[userID].status = Offline;
         fflush(stdout);
     } else if (read_size == -1) {
         perror("recv failed");
     }
 
     ConnectionEnd:
-    // Free the socket pointer
     free(socket_desc);
 
     return 0;

@@ -28,7 +28,9 @@ enum retCode {
 const char userCommand[10][120] = {
         "/reg",
         "/login",
-        "",
+        "/list",
+        "/request",
+        "/accept",
 };
 
 
