@@ -3,4 +3,6 @@
 
 void *connection_handler(void *);
 
+int userAuthorisation(int socket);
+
 #endif

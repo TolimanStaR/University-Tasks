@@ -7,6 +7,8 @@
 #include <time.h>
 #include <stdlib.h>
 
+#define MESSAGE_LENGTH 500
+
 #define MAX_USERS 128
 #define MAX_CHATS 64
 #define MAX_GROUPS 32
@@ -16,6 +18,17 @@ enum userStatus {
     Online,
     Busy,
     Offline,
+};
+
+enum retCode {
+    OK,
+    ERROR,
+};
+
+const char userCommand[10][120] = {
+        "/reg",
+        "/login",
+        "",
 };
 
 
@@ -49,7 +62,7 @@ typedef struct Group {
 
 
 int usersCount;
-User a[MAX_USERS];
+User usersList[MAX_USERS];
 
 
 #endif

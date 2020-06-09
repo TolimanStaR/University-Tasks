@@ -1,8 +1,12 @@
+// gcc -pthread -o client main.c header.h source.c
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "header.h"
 
@@ -10,8 +14,9 @@
 int main(int argc, char *argv[]) {
     int sock;
     struct sockaddr_in server;
-    char message[1000], server_reply[2000];
-    int user_msg_len;
+    char message[MESSAGE_LENGTH] = {0};
+    char server_reply[MESSAGE_LENGTH] = {0};
+    enum retCode code;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
@@ -31,23 +36,37 @@ int main(int argc, char *argv[]) {
     puts("Connected to server\n");
 
     pthread_t receiving_thread;
+    pthread_t send_thread;
 
+    Args *args = malloc(sizeof(Args));
+    args->socket = sock;
+    code = ERROR;
 
-    while (1) {
-        printf("Enter message : ");
-        gets(message);
+    if (pthread_create(&receiving_thread, NULL, serverMessagesReceiver, (void *) args) < 0) {
+        return pthreadError(code);
+    }
 
-        //Send some data
-        if (send(sock, message, strlen(message), 0) < 0) {
-            puts("Send failed");
-            return 1;
-        }
+    if (pthread_create(&send_thread, NULL, serverMessagesSender, (void*) args) < 0) {
+        return pthreadError(code);
+    }
+
+    sleep(1000000);
+
+//    while (1) {
+//        // printf("Enter message : ");
+//        fgets(message, 2000, stdin);
+//
+//        //Send some data
+//        if (send(sock, message, strlen(message), 0) < 0) {
+//            puts("Send failed");
+//            return 1;
+//        }
 
         //Receive a reply from the server
-        if ((user_msg_len = recv(sock, server_reply, 2000, 0)) < 0) {
-            puts("recv failed");
-            break;
-        }
+//        if ((user_msg_len = recv(sock, server_reply, 2000, 0)) < 0) {
+//            puts("recv failed");
+//            break;
+//        }
 //        int re_len;
 //        while ((re_len = recv(sock, server_reply, 2000, 0)) > 0) {
 //            puts(server_reply);
@@ -55,11 +74,12 @@ int main(int argc, char *argv[]) {
 //            puts("\n");
 //        }
 
-        server_reply[user_msg_len] = '\0';
-        puts("Server reply : ");
-        puts(server_reply);
-    }
+        // server_reply[user_msg_len] = '\0';
+//        puts("Server reply : ");
+//        puts(server_reply);
+    //}
 
     pclose((int *) &sock);
-    return 0;
+    code = OK;
+    return code;
 }
