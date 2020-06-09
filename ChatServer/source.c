@@ -8,14 +8,17 @@
 #include <time.h>
 #include <unistd.h>
 
-
 #include "data.h"
 
+
 int userAuthorisation(int socket) {
+
 
     char clientMessage[MESSAGE_LENGTH] = {0};
     char serverMessage[MESSAGE_LENGTH] = {0};
     int read_size;
+
+    AuthenticationStart:
 
     strcpy(serverMessage, "What's up, Anonymous user! \n"
                           "Please register to use Polygram social network! \n"
@@ -50,7 +53,7 @@ int userAuthorisation(int socket) {
         }
 
         for (unsigned int userIndex = 0; userIndex < usersCount; ++userIndex) {
-            if (strcpy(userName, usersList[userIndex].username))
+            if (!strcmp(userName, usersList[userIndex].username))
                 existFlag = 1;
         }
 
@@ -74,9 +77,13 @@ int userAuthorisation(int socket) {
         }
 
         User newUser;
+
         strcpy(newUser.username, userName);
         strcpy(newUser.password, password);
+
         newUser.userID = usersCount;
+        newUser.socket = socket;
+
         usersList[usersCount] = newUser;
         usersCount++;
 
@@ -84,9 +91,7 @@ int userAuthorisation(int socket) {
         write(socket, serverMessage, strlen(serverMessage));
 
         return newUser.userID;
-    }
-
-    if (!strcmp(userCommand[1], clientMessage)) {
+    } else if (!strcmp(userCommand[1], clientMessage)) {
         char username[31] = {0};
         char password[31] = {0};
 
@@ -123,15 +128,15 @@ int userAuthorisation(int socket) {
         strcpy(serverMessage, "This username doesn't exist.");
         write(socket, serverMessage, strlen(serverMessage));
         goto EnterUserNameLogin;
-
-    }
+    } else goto AuthenticationStart;
 }
 
 
 void *connection_handler(void *socket_desc) {
     int sock = *(int *) socket_desc;
     int read_size, userID;
-    char client_message[MESSAGE_LENGTH];
+    char clientMessage[MESSAGE_LENGTH] = {0};
+    char serverMessage[MESSAGE_LENGTH] = {0};
 
     userID = userAuthorisation(sock);
 
@@ -140,13 +145,102 @@ void *connection_handler(void *socket_desc) {
         return (void *) -1;
     }
 
+    strcpy(serverMessage, "Now you are online \n"
+                          "You can check users list -> /list \n"
+                          "You can call any online user to chat with him -> /request <username> \n"
+                          "If some one asks you for chat. You can /accept or /decline it");
+    write(sock, serverMessage, strlen(serverMessage));
 
-    while ((read_size = recv(sock, client_message, MESSAGE_LENGTH, 0)) > 0) {
-        printf("client message is (%d sym) >>> %s", read_size, client_message);
 
+    while ((read_size = recv(sock, clientMessage, MESSAGE_LENGTH, 0)) > 0) {    // MAIN CYCLE
+        printf("client message is (%d sym) >>> %s", read_size, clientMessage);
+
+        if (usersList[userID].status == Online) { // catch commands
+            clientMessage[read_size - 1] = '\0';
+            char command[50];
+            char friend[31];
+
+            if (!strcmp(clientMessage, userCommand[2])) { //list of users
+                for (unsigned int userIndex = 0; userIndex < usersCount; ++userIndex) {
+                    char status[20];
+                    strcpy(serverMessage, usersList[userIndex].username);
+                    strcat(serverMessage, " - ");
+
+                    switch (usersList[userIndex].status) {
+                        case 0:
+                            strcpy(status, "Online\n");
+                            break;
+                        case 1:
+                            strcpy(status, "Busy\n");
+                            break;
+                        case 2:
+                            strcpy(status, "Offline\n");
+                            break;
+                    }
+
+                    strcat(serverMessage, status);
+                    write(sock, serverMessage, strlen(serverMessage));
+                }
+                continue;
+            }
+
+            strcpy(command, strtok(clientMessage, " "));
+            strcpy(friend, strtok(NULL, " "));
+
+            if (!strcmp(command, userCommand[3])) {
+                for (int userIndex = 0; userIndex < usersCount; ++userIndex) {
+                    if (!strcmp(usersList[userIndex].username, friend)) {
+                        if (strcmp(friend, usersList[userID].username) != 0) {
+                            strcpy(serverMessage, "You have requested user ");
+                            strcat(serverMessage, friend);
+                            strcat(serverMessage, " to chat");
+
+                            write(sock, serverMessage, strlen(serverMessage));
+
+                            strcpy(serverMessage, "User ");
+                            strcat(serverMessage, usersList[userID].username);
+                            strcat(serverMessage, " requests you to chat. Write /accept ");
+                            strcat(serverMessage, usersList[userID].username);
+                            strcat(serverMessage, " to accept or /decline ");
+                            strcat(serverMessage, usersList[userID].username);
+                            strcat(serverMessage, " to decline");
+
+                            write(usersList[userIndex].socket, serverMessage, strlen(serverMessage));
+
+                            break;
+                        }
+                    }
+                }
+            } else if (!strcmp(command, userCommand[4])) { // accept chat
+                Chat newChat;
+
+                for (int userIndex = 0; userIndex < usersCount; ++userIndex) {
+                    if (!strcmp(friend, usersList[userIndex].username)) {
+                        newChat.firstUser = usersList[userID];
+                        newChat.secondUser = usersList[userIndex];
+                        newChat.chatID = chatsCount++;
+                        usersList[userID].currentChatID = newChat.chatID;
+                        usersList[userIndex].currentChatID = newChat.chatID;
+                        usersList[userID].status = Busy;
+                        usersList[userIndex].status = Busy;
+                        chatsList[newChat.chatID] = newChat;
+
+                        break;
+                    }
+                }
+
+
+            } else if (!strcmp(command, userCommand[5])) { // decline chat
+
+            }
+
+
+        } else if (usersList[userID].status == Busy) { // user chats with somebody
+
+        }
 
         for (int i = 0; i < MESSAGE_LENGTH; ++i)
-            client_message[i] = '\0';
+            clientMessage[i] = '\0';
     }
 
     if (read_size == 0) {

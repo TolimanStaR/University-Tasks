@@ -31,6 +31,7 @@ const char userCommand[10][120] = {
         "/list",
         "/request",
         "/accept",
+        "/decline",
 };
 
 
@@ -41,6 +42,7 @@ typedef struct User {
     char password[30];
     int socket;
     int status;
+    int currentChatID;
 } User;
 
 
@@ -53,7 +55,8 @@ typedef struct Message {
 
 typedef struct Chat {
     User firstUser;
-    User seconduser;
+    User secondUser;
+    int chatID;
 } Chat;
 
 
@@ -65,6 +68,9 @@ typedef struct Group {
 
 int usersCount;
 User usersList[MAX_USERS];
+
+int chatsCount;
+Chat chatsList[MAX_CHATS];
 
 
 #endif
