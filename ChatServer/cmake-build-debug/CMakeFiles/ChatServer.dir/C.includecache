@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/Clion/University-Tasks/ChatServer/main.c
+stdio.h
+-
+string.h
+-
+stdlib.h
+-
+winsock.h
+-
+inaddr.h
+-
+unistd.h
+-
+pthread.h
+-
+
