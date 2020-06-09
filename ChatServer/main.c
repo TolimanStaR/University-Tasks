@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         perror("bind failed. Error");
         return 1;
     }
-    puts("bind done");
+    puts("Bind done");
 
     listen(socket_desc, 128);
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     c = sizeof(struct sockaddr_in);
 
     while ((client_sock = accept(socket_desc, (struct sockaddr *) &client, (socklen_t * ) & c))) {
-        puts("Connection accepted");
+        puts("Connection accepted!");
 
         pthread_t sniffer_thread;
         new_sock = malloc(1);
@@ -48,8 +48,6 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        //Now join the thread , so that we dont terminate before the thread
-        //pthread_join( sniffer_thread , NULL);
         puts("Handler assigned");
     }
 

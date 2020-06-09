@@ -13,7 +13,6 @@
 
 int userAuthorisation(int socket) {
 
-
     char clientMessage[MESSAGE_LENGTH] = {0};
     char serverMessage[MESSAGE_LENGTH] = {0};
     int read_size;
@@ -139,6 +138,7 @@ void *connection_handler(void *socket_desc) {
     char clientMessage[MESSAGE_LENGTH] = {0};
     char clientMessageCopy[MESSAGE_LENGTH] = {0};
     char serverMessage[MESSAGE_LENGTH + 100] = {0};
+    char comma[100];
 
     userID = userAuthorisation(sock);
 
@@ -244,7 +244,7 @@ void *connection_handler(void *socket_desc) {
 
                         strcpy(serverMessage, "Now you are chatting with ");
                         strcat(serverMessage, newChat.firstUser.username);
-                        strcat(serverMessage, "\nLeave chat with /leave");
+                        strcat(serverMessage, "\nLeave chat with /leave chat");
 
                         write(newChat.secondSocket, serverMessage, strlen(serverMessage));
 
@@ -254,16 +254,26 @@ void *connection_handler(void *socket_desc) {
                 continue;
 
             } else if (!strcmp(command, userCommand[5])) { // decline chat
-
+                for (int userIndex = 0; userIndex < usersCount; ++userIndex) {
+                    if (!strcmp(friend, usersList[userIndex].username)) {
+                        strcpy(serverMessage, "User ");
+                        strcat(serverMessage, usersList[userID].username);
+                        strcat(serverMessage, " declined your request.");
+                        write(usersList[userIndex].socket, serverMessage, strlen(serverMessage));
+                        break;
+                    }
+                }
             }
-
-
         } else if (usersList[userID].status == Busy) { // user chats with somebody
             char command[30];
             strcpy(command, strtok(clientMessage, " "));
 
             if (!strcmp(command, userCommand[6])) { // leave chat
-
+                Chat currentChat = chatsList[usersList[userID].currentChatID];
+                usersList[currentChat.firstUser.userID].status = Online;
+                usersList[currentChat.secondUser.userID].status = Online;
+                usersList[currentChat.firstUser.userID].currentChatID = None;
+                usersList[currentChat.secondUser.userID].currentChatID = None;
             } else { // it is message
                 puts("chat");
                 Chat currentChat = chatsList[usersList[userID].currentChatID];

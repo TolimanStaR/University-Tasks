@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #define MESSAGE_LENGTH 500
+#define None (int)0
 
 #define MAX_USERS 128
 #define MAX_CHATS 64
