@@ -135,8 +135,10 @@ int userAuthorisation(int socket) {
 void *connection_handler(void *socket_desc) {
     int sock = *(int *) socket_desc;
     int read_size, userID;
+
     char clientMessage[MESSAGE_LENGTH] = {0};
-    char serverMessage[MESSAGE_LENGTH] = {0};
+    char clientMessageCopy[MESSAGE_LENGTH] = {0};
+    char serverMessage[MESSAGE_LENGTH + 100] = {0};
 
     userID = userAuthorisation(sock);
 
@@ -154,6 +156,8 @@ void *connection_handler(void *socket_desc) {
 
     while ((read_size = recv(sock, clientMessage, MESSAGE_LENGTH, 0)) > 0) {    // MAIN CYCLE
         printf("client message is (%d sym) >>> %s", read_size, clientMessage);
+
+        strcpy(clientMessageCopy, clientMessage);
 
         if (usersList[userID].status == Online) { // catch commands
             clientMessage[read_size - 1] = '\0';
@@ -185,12 +189,15 @@ void *connection_handler(void *socket_desc) {
             }
 
             strcpy(command, strtok(clientMessage, " "));
-            strcpy(friend, strtok(NULL, " "));
 
             if (!strcmp(command, userCommand[3])) {
+                strcpy(friend, strtok(NULL, " "));
                 for (int userIndex = 0; userIndex < usersCount; ++userIndex) {
                     if (!strcmp(usersList[userIndex].username, friend)) {
                         if (strcmp(friend, usersList[userID].username) != 0) {
+
+                            // TODO: add a message about status of requested user
+
                             strcpy(serverMessage, "You have requested user ");
                             strcat(serverMessage, friend);
                             strcat(serverMessage, " to chat");
@@ -212,23 +219,39 @@ void *connection_handler(void *socket_desc) {
                     }
                 }
             } else if (!strcmp(command, userCommand[4])) { // accept chat
+
                 Chat newChat;
+                strcpy(friend, strtok(NULL, " "));
 
                 for (int userIndex = 0; userIndex < usersCount; ++userIndex) {
                     if (!strcmp(friend, usersList[userIndex].username)) {
                         newChat.firstUser = usersList[userID];
                         newChat.secondUser = usersList[userIndex];
                         newChat.chatID = chatsCount++;
+                        newChat.firstSocket = usersList[userID].socket;
+                        newChat.secondSocket = usersList[userIndex].socket;
                         usersList[userID].currentChatID = newChat.chatID;
                         usersList[userIndex].currentChatID = newChat.chatID;
                         usersList[userID].status = Busy;
                         usersList[userIndex].status = Busy;
                         chatsList[newChat.chatID] = newChat;
 
+                        strcpy(serverMessage, "Now you are chatting with ");
+                        strcat(serverMessage, newChat.secondUser.username);
+                        strcat(serverMessage, "\nLeave chat with /leave");
+
+                        write(newChat.firstSocket, serverMessage, strlen(serverMessage));
+
+                        strcpy(serverMessage, "Now you are chatting with ");
+                        strcat(serverMessage, newChat.firstUser.username);
+                        strcat(serverMessage, "\nLeave chat with /leave");
+
+                        write(newChat.secondSocket, serverMessage, strlen(serverMessage));
+
                         break;
                     }
                 }
-
+                continue;
 
             } else if (!strcmp(command, userCommand[5])) { // decline chat
 
@@ -236,7 +259,27 @@ void *connection_handler(void *socket_desc) {
 
 
         } else if (usersList[userID].status == Busy) { // user chats with somebody
+            char command[30];
+            strcpy(command, strtok(clientMessage, " "));
 
+            if (!strcmp(command, userCommand[6])) { // leave chat
+
+            } else { // it is message
+                puts("chat");
+                Chat currentChat = chatsList[usersList[userID].currentChatID];
+                User Me = usersList[userID];
+                User Friend;
+                if (Me.socket == currentChat.firstSocket)  // friend - second
+                    Friend = currentChat.secondUser;
+                else
+                    Friend = currentChat.firstUser;
+
+                strcpy(serverMessage, Me.username);
+                strcat(serverMessage, " : ");
+                strcat(serverMessage, clientMessageCopy);
+
+                write(Friend.socket, serverMessage, strlen(serverMessage));
+            }
         }
 
         for (int i = 0; i < MESSAGE_LENGTH; ++i)

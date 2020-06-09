@@ -32,6 +32,7 @@ const char userCommand[10][120] = {
         "/request",
         "/accept",
         "/decline",
+        "/leave",
 };
 
 
@@ -56,6 +57,8 @@ typedef struct Message {
 typedef struct Chat {
     User firstUser;
     User secondUser;
+    int firstSocket;
+    int secondSocket;
     int chatID;
 } Chat;
 

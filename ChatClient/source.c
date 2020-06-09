@@ -30,6 +30,12 @@ void *serverMessagesSender(void *argsSet) {
 
     while (1) {
         fgets(serverSendMessage, MESSAGE_LENGTH, stdin);
+
+        if (strlen(serverSendMessage) < 2) {
+            puts("Too few symbols");
+            continue;
+        }
+
         if (send(args->socket, serverSendMessage, strlen(serverSendMessage), 0) < 0) {
             puts("Send failed");
             break;
