@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <random>
 
 using namespace std;
 
@@ -12,6 +13,7 @@ using namespace std;
 #define True true
 #define False false
 #define all(v) (v).begin(), (v).end()
+#define edg(a, n) (a), ((a)+(n))
 #define max(a, b) (a)>(b)?(a):(b)
 #define min(a, b) (a)<(b)?(a):(b)
 
@@ -63,7 +65,6 @@ int fastpow_modulo(int number, int power, int modulo) {
 }
 
 int dsu_parent[5 * 100 * 1000 + 1];
-
 int dsu_rank[5 * 100 * 1000 + 1];
 
 void make_set(int v) {
@@ -104,7 +105,6 @@ void print(T1 elem_1, T2 elem_2, T3 elem_3) {
     std::cout << elem_1 << elem_2 << elem_3 << '\n';
 }
 
-
 template<typename T1, typename T2>
 void printa(T1 container, T2 size) {
     rep(size) std::cout << container[i] << ' ';
@@ -120,20 +120,35 @@ std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
     return out;
 }
 
+template<typename T>
+std::istream &operator>>(std::istream &in, std::vector<T> &v) {
+    for (int i = 0; i < v.size(); ++i) in >> v[i];
+    return in;
+}
+
 void io_optimization() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 }
 
+void read_file(const char *in, const char *out) {
+    freopen(in, "r", stdin);
+    freopen(out, "w", stdout);
+}
+
 // ******************************************
 
 bool is_prime(int number) {
-    for (int divider = 2; divider * divider <= number; ++divider)if (!(number % divider))return false;
+    if (number <= 1)
+        return false;
+    for (int divider = 2; divider * divider <= number; ++divider)
+        if (!(number % divider))
+            return false;
     return true;
 }
 
-vi all_primes(int edge) {
+vi all_primes(int edge) { // edge is included
     vi primes;
     auto table = new bool[edge + 1]{true, true};
     for (int i = 2; i < edge + 1; ++i) {
@@ -141,9 +156,19 @@ vi all_primes(int edge) {
             table[j] = true;
         }
     }
-
-    for (int i = 1; i < edge + 1; ++i)if (!table[i])primes.push_back(i);
+    for (int i = 1; i < edge + 1; ++i)
+        if (!table[i])primes.push_back(i);
     return primes;
+}
+
+int count_primes(int start, int finish) { // edge is included
+    auto primes = all_primes(finish);
+    return primes.size() - (lower_bound(all(primes), start) - primes.begin());
+}
+
+int next_prime(int number) {
+    while (!is_prime(++number));
+    return number;
 }
 
 vi prime_factors(int number) {
@@ -175,15 +200,14 @@ vi factor(int number) {
 }
 
 bool ferma(int base, int candidate) {
-    base = fastpow_modulo(base, candidate - 1, candidate);
-    if (base - 1) return false;
-    return true;
+    return fastpow_modulo(base, candidate - 1, candidate) - 1 == 0;
 }
 
-
 bool is_pseudoprime(int number) {
+    random_device generator;
     for (int i = 0; i < 100; ++i) {
-        int base = (abs(random()) + 2) % number;
+        int base = (generator() + 2) % number;
+        if (base == 0) base = 2;
         if (!ferma(base, number)) return false;
     }
     return true;
@@ -191,13 +215,16 @@ bool is_pseudoprime(int number) {
 
 // ******************************************
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-msc51-cpp"
 
 signed main() {
+    srand(time(nullptr));
     io_optimization();
-
-//    freopen("input.in", "r", stdin);
-//    freopen("input.txt", "w", stdout);
-
+    // read_file("input.txt", "output.txt");
+    
 
     return 0;
 }
+
+#pragma clang diagnostic pop
