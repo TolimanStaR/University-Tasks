@@ -199,6 +199,30 @@ vi factor(int number) {
     return factors;
 }
 
+vector<pair<int, int >> prime_factors_map(int n) {
+    vector<pair<int, int>> result;
+    auto factors = prime_factors(n);
+    int cur = factors[0];
+    result.emplace_back(cur, 1);
+    for (int i = 1; i < factors.size(); ++i) {
+        if (cur == factors[i]) {
+            result.back().second++;
+        } else {
+            cur = factors[i];
+            result.emplace_back(cur, 1);
+        }
+    }
+    return result;
+}
+
+int euler(int n) {
+    int result = 1;
+    for (auto x : prime_factors_map(n)) {
+        result *= x.second == 1 ? x.first - 1 : pow(x.first, x.second) - pow(x.first, x.second - 1);
+    }
+    return result;
+}
+
 bool ferma(int base, int candidate) {
     return fastpow_modulo(base, candidate - 1, candidate) - 1 == 0;
 }
@@ -218,13 +242,56 @@ bool is_pseudoprime(int number) {
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cert-msc51-cpp"
 
+auto split(const vector<string> &s) {
+    vector<vector<string> > result;
+    vector<string> buf;
+    auto sz = s.size();
+    for (int i = 0; i < sz; ++i) {
+        buf.pb(s[i]);
+        if (i + 1 < sz) {
+            if (s[i + 1].length() < 3) {
+                result.pb(buf);
+                buf.clear();
+            }
+        }
+    }
+    if (!buf.empty())
+        result.pb(buf);
+    re result;
+}
+
+int m = 1000000000 + 7;
+
+int get_group_ans(const vector<string> &s, int k) {
+    int dp = 1;
+    int max_digit_len = s[0].length();
+    int prev_max_cnt = 0;
+    if (s[0].length() + 3 > k)
+        prev_max_cnt++;
+    for (int i = 1; i < s.size(); ++i) {
+        if (s[i][0] != '0') {
+            dp *= 2;
+            dp -= prev_max_cnt;
+            dp %= m;
+            if (max_digit_len + 3 <= k)
+                max_digit_len += 3;
+            if (max_digit_len + 3 > k)
+                prev_max_cnt = min(dp, prev_max_cnt + 1);
+        } else {
+            dp -= prev_max_cnt;
+        }
+    }
+    return dp;
+}
+
+
 signed main() {
     srand(time(nullptr));
     io_optimization();
-    // read_file("input.txt", "output.txt");
-    
 
-    return 0;
+    print(factor(120));
+    print(prime_factors(120));
+    print(euler(120));
 }
 
 #pragma clang diagnostic pop
